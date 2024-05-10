@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -74,6 +74,30 @@ async function run() {
       res.send(book);
     });
 
+    app.put("/books/:id", async (req, res) => {
+      const data = req.body;
+      console.log(data.reduced)
+      const paramsId = req.params.id;
+      const filter = { _id: new ObjectId(paramsId) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          quantity: data.reduced,
+        },
+      };
+      const result = await bookCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+    
+
+
+
+
+
+
+
+
+
 
 
     app.get("/categories/:name", async (req, res) => {
@@ -86,11 +110,11 @@ async function run() {
     });
 
     //////////borrowedBooks////////////
-    const boorrowdBooks = client.db("readopiaDB").collection("borrowed");
+    const borrowdBooks = client.db("readopiaDB").collection("borrowed");
 
     app.post("/borrowed", async (req, res) => {
       const borrowed= req.body;
-      const result = await boorrowdBooks.insertOne(borrowed);
+      const result = await borrowdBooks.insertOne(borrowed);
       res.send(result);
     });
 
