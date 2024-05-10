@@ -34,23 +34,21 @@ async function run() {
     //////////////////// User APIs/////////////////////////////
     const usersDB = client.db("readopiaDB").collection("users");
 
-    app.post('/users', async (req, res) => {
+    app.post("/users", async (req, res) => {
       const users = req.body;
       console.log(users);
       const result = await usersDB.insertOne(users);
-      res.send(result)
-    })
-    
+      res.send(result);
+    });
 
     //////////////////// Book Category info APIs/////////////////////////////
     const categoryCollection = client.db("readopiaDB").collection("categories");
-    app.post('/categories', async (req, res) => {
+    app.post("/categories", async (req, res) => {
       const category = req.body;
       console.log(category);
       const result = await categoryCollection.insertOne(category);
-      res.send(result)
-    })
-
+      res.send(result);
+    });
 
     app.get("/categories", async (req, res) => {
       const data = categoryCollection.find();
@@ -58,30 +56,25 @@ async function run() {
       res.send(result);
     });
 
+    ////////////////////book Data APIs/////////////////////////
 
+    const bookCollection = client.db("readopiaDB").collection("books");
 
+    app.post("/books", async (req, res) => {
+      const book = req.body;
+      console.log(book);
+      const result = await bookCollection.insertOne(book);
+      res.send(result);
+    });
 
-////////////////////book Data APIs/////////////////////////
+    app.get("/categories/:name", async (req, res) => {
+      const categoryName = req.params.name;
 
-
-const bookCollection = client.db("readopiaDB").collection("books");
-
-app.post('/books', async (req, res) => {
-  const book = req.body;
-  console.log(book);
-  const result = await bookCollection.insertOne(book);
-  res.send(result)
-})
-
-
-
-
-
-
-
-
-
-
+      const result = await bookCollection
+        .find({ category: categoryName })
+        .toArray();
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
