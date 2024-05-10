@@ -42,6 +42,24 @@ async function run() {
     })
     
 
+    //////////////////// Book Category info APIs/////////////////////////////
+    const categoryCollection = client.db("readopiaDB").collection("categories");
+    app.post('/categories', async (req, res) => {
+      const category = req.body;
+      console.log(category);
+      const result = await categoryCollection.insertOne(category);
+      res.send(result)
+    })
+
+
+    app.get("/categories", async (req, res) => {
+      const data = categoryCollection.find();
+      const result = await data.toArray();
+      res.send(result);
+    });
+
+
+
 
 ////////////////////book Data APIs/////////////////////////
 
