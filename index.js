@@ -31,7 +31,39 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const usersDB = client.db("ReadopiaDB").collection("Users");    
+    //////////////////// User APIs/////////////////////////////
+    const usersDB = client.db("readopiaDB").collection("users");
+
+    app.post('/users', async (req, res) => {
+      const users = req.body;
+      console.log(users);
+      const result = await usersDB.insertOne(users);
+      res.send(result)
+    })
+    
+
+
+////////////////////book Data APIs/////////////////////////
+
+
+const bookCollection = client.db("readopiaDB").collection("books");
+
+app.post('/books', async (req, res) => {
+  const book = req.body;
+  console.log(book);
+  const result = await bookCollection.insertOne(book);
+  res.send(result)
+})
+
+
+
+
+
+
+
+
+
+
 
     await client.db("admin").command({ ping: 1 });
     console.log(
