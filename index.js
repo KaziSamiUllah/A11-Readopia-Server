@@ -67,6 +67,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/books/:name", async (req, res) => {
+      const name = req.params.name;
+      const query = { name: name };
+      const book = await bookCollection.findOne(query);
+      res.send(book);
+    });
+
+
+
     app.get("/categories/:name", async (req, res) => {
       const categoryName = req.params.name;
 
@@ -75,6 +84,18 @@ async function run() {
         .toArray();
       res.send(result);
     });
+
+    //////////borrowedBooks////////////
+    const boorrowdBooks = client.db("readopiaDB").collection("borrowed");
+
+    app.post("/borrowed", async (req, res) => {
+      const borrowed= req.body;
+      const result = await boorrowdBooks.insertOne(borrowed);
+      res.send(result);
+    });
+
+
+    //////////////////////////////////////////////////////////////////
 
     await client.db("admin").command({ ping: 1 });
     console.log(
