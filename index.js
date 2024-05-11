@@ -74,31 +74,23 @@ async function run() {
       res.send(book);
     });
 
+
+    ////////////Updating book quantity////////////////////
     app.put("/books/:id", async (req, res) => {
-      const data = req.body;
-      console.log(data.reduced)
+      const changeQty = parseInt(req.body.qty);
+      console.log(changeQty)
       const paramsId = req.params.id;
+      console.log(paramsId)
       const filter = { _id: new ObjectId(paramsId) };
       const options = { upsert: true };
       const updateDoc = {
-        $set: {
-          quantity: data.reduced,
+        $inc: {
+          quantity: changeQty,
         },
       };
       const result = await bookCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
-    
-
-
-
-
-
-
-
-
-
-
 
     app.get("/categories/:name", async (req, res) => {
       const categoryName = req.params.name;
@@ -113,11 +105,29 @@ async function run() {
     const borrowdBooks = client.db("readopiaDB").collection("borrowed");
 
     app.post("/borrowed", async (req, res) => {
-      const borrowed= req.body;
+      const borrowed = req.body;
       const result = await borrowdBooks.insertOne(borrowed);
       res.send(result);
     });
 
+    app.get("/borrowed/:email", async (req, res) => {
+      const userEmail = req.params.email;
+      console.log(userEmail);
+      const result = await borrowdBooks
+        .find({ email : userEmail })
+        .toArray();
+      res.send(result);
+    });
+
+
+
+    app.delete("/borrowed/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id)
+      const query = { _id: new ObjectId(id) };
+      const result = await borrowdBooks.deleteOne(query);
+      res.send(result);
+    });
 
     //////////////////////////////////////////////////////////////////
 
