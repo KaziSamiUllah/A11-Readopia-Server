@@ -36,7 +36,7 @@ async function run() {
 
     app.post("/users", async (req, res) => {
       const users = req.body;
-      console.log(users);
+      // console.log(users);
       const result = await usersDB.insertOne(users);
       res.send(result);
     });
@@ -45,7 +45,7 @@ async function run() {
     const categoryCollection = client.db("readopiaDB").collection("categories");
     app.post("/categories", async (req, res) => {
       const category = req.body;
-      console.log(category);
+      // console.log(category);
       const result = await categoryCollection.insertOne(category);
       res.send(result);
     });
@@ -60,9 +60,15 @@ async function run() {
 
     const bookCollection = client.db("readopiaDB").collection("books");
 
+    app.get("/books", async (req, res) => {
+      const data = bookCollection.find();
+      const result = await data.toArray();
+      res.send(result);
+    });
+
     app.post("/books", async (req, res) => {
       const book = req.body;
-      console.log(book);
+      // console.log(book);
       const result = await bookCollection.insertOne(book);
       res.send(result);
     });
@@ -74,23 +80,72 @@ async function run() {
       res.send(book);
     });
 
-
     ////////////Updating book quantity////////////////////
+
     app.put("/books/:id", async (req, res) => {
-      const changeQty = parseInt(req.body.qty);
-      console.log(changeQty)
+      const data = req.body;
+      console.log(data);
       const paramsId = req.params.id;
-      console.log(paramsId)
+      console.log(paramsId);
       const filter = { _id: new ObjectId(paramsId) };
       const options = { upsert: true };
-      const updateDoc = {
-        $inc: {
-          quantity: changeQty,
-        },
-      };
-      const result = await bookCollection.updateOne(filter, updateDoc, options);
-      res.send(result);
+      if (data.qty !== undefined) {
+        changeQty = parseInt(data.qty);
+
+        const updateDoc = {
+          $inc: {
+            quantity: changeQty,
+          },
+        };
+        const result = await bookCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+      }
+
+
+       else {
+        const updateDoc = {
+          $set: {
+            url : data.url,
+            name : data.name,
+            quantity : data.quantity,
+            author : data.author,
+            category : data.category,
+            description : data.description,
+            rating : data.rating
+          },
+        };
+        const result = await bookCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+      }
     });
+
+    // app.put("/books/:id", async (req, res) => {
+    //   const changeQty = parseInt(req.body.qty);
+    //   console.log(changeQty)
+    //   const paramsId = req.params.id;
+    //   console.log(paramsId)
+    //   const filter = { _id: new ObjectId(paramsId) };
+    //   const options = { upsert: true };
+    //   const updateDoc = {
+    //     $inc: {
+    //       quantity: changeQty,
+    //     },
+    //   };
+    //   const result = await bookCollection.updateOne(filter, updateDoc, options);
+    //   res.send(result);
+    // });
+
+    ///////////////Update book data/////////////////////
+
+    /////////////////Category APIs///////////////////////
 
     app.get("/categories/:name", async (req, res) => {
       const categoryName = req.params.name;
@@ -113,17 +168,13 @@ async function run() {
     app.get("/borrowed/:email", async (req, res) => {
       const userEmail = req.params.email;
       console.log(userEmail);
-      const result = await borrowdBooks
-        .find({ email : userEmail })
-        .toArray();
+      const result = await borrowdBooks.find({ email: userEmail }).toArray();
       res.send(result);
     });
 
-
-
     app.delete("/borrowed/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id)
+      console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await borrowdBooks.deleteOne(query);
       res.send(result);
