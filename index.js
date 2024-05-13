@@ -36,7 +36,7 @@ const vrifyToken = (req, res, next) => {
           next();
       })
   }
-  console.log(token);
+
 
 
 }
@@ -103,7 +103,6 @@ async function run() {
 
         app.post("/users", async (req, res) => {
           const users = req.body;
-          console.log(users);
           const result = await usersDB.insertOne(users);
           res.send(result);
         });
@@ -128,7 +127,6 @@ async function run() {
 
     app.post("/books", vrifyToken, async (req, res) => {
       const book = req.body;
-      // console.log(book);
       const result = await bookCollection.insertOne(book);
       res.send(result);
     });
@@ -142,11 +140,9 @@ async function run() {
 
     ////////////Updating book quantity////////////////////
 
-    app.put("/books/:id", vrifyToken,  async (req, res) => {
+    app.put("/books/:id", async (req, res) => {
       const data = req.body;
-      console.log(data);
       const paramsId = req.params.id;
-      console.log(paramsId);
       const filter = { _id: new ObjectId(paramsId) };
       const options = { upsert: true };
       if (data.qty !== undefined) {
@@ -192,7 +188,6 @@ async function run() {
     const categoryCollection = client.db("readopiaDB").collection("categories");
     app.post("/categories", async (req, res) => {
       const category = req.body;
-      // console.log(category);
       const result = await categoryCollection.insertOne(category);
       res.send(result);
     });
@@ -223,16 +218,14 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/borrowed/:email", vrifyToken,  async (req, res) => {
+    app.get("/borrowed/:email",  async (req, res) => {
       const userEmail = req.params.email;
-      console.log(userEmail);
       const result = await borrowdBooks.find({ email: userEmail }).toArray();
       res.send(result);
     });
 
-    app.delete("/borrowed/:id", vrifyToken,  async (req, res) => {
+    app.delete("/borrowed/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await borrowdBooks.deleteOne(query);
       res.send(result);
