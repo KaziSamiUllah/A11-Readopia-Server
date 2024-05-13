@@ -36,10 +36,18 @@ async function run() {
 
     app.post("/users", async (req, res) => {
       const users = req.body;
-      // console.log(users);
+      console.log(users);
       const result = await usersDB.insertOne(users);
       res.send(result);
     });
+
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { userEmail: email };
+      const userData = await usersDB.findOne(query);
+      res.send(userData);
+    });
+
 
     //////////////////// Book Category info APIs/////////////////////////////
     const categoryCollection = client.db("readopiaDB").collection("categories");
@@ -127,21 +135,7 @@ async function run() {
       }
     });
 
-    // app.put("/books/:id", async (req, res) => {
-    //   const changeQty = parseInt(req.body.qty);
-    //   console.log(changeQty)
-    //   const paramsId = req.params.id;
-    //   console.log(paramsId)
-    //   const filter = { _id: new ObjectId(paramsId) };
-    //   const options = { upsert: true };
-    //   const updateDoc = {
-    //     $inc: {
-    //       quantity: changeQty,
-    //     },
-    //   };
-    //   const result = await bookCollection.updateOne(filter, updateDoc, options);
-    //   res.send(result);
-    // });
+
 
     ///////////////Update book data/////////////////////
 
