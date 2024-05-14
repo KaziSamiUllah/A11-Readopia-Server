@@ -11,7 +11,10 @@ const port = process.env.PORT || 5000;
 // app.use(cors());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://readopia-a11-t008.web.app",
+      "https://readopia-a11-t008.firebaseapp.com"],
     credentials: true,
     optionSuccessStatus: 200,
   })
@@ -20,18 +23,17 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-const vrifyToken = (req, res, next) => {
-  console.log('ami middle')
+const verifyToken = (req, res, next) => {
 
   const token = req.cookies?.token;
   if (!token) return res.status(401).send({ message: 'unauthorized access' })
   if (token) {
       jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decode) => {
           if (err) {
-              console.log(err)
+     
              return res.status(401).send({ message: 'unauthorized access' })
           }
-          console.log(decode);
+
           req.user = decode
           next();
       })
@@ -50,7 +52,6 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`crud is running through ${port}`);
 });
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.zunyezi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -107,7 +108,7 @@ async function run() {
           res.send(result);
         });
     
-        app.get("/users/:email", vrifyToken, async (req, res) => {
+        app.get("/users/:email", verifyToken, async (req, res) => {
           const email = req.params.email;
           const query = { userEmail: email };
           const userData = await usersDB.findOne(query);
@@ -119,19 +120,19 @@ async function run() {
 
     const bookCollection = client.db("readopiaDB").collection("books");
 
-    app.get("/books", vrifyToken, async (req, res) => {
+    app.get("/books", verifyToken, async (req, res) => {
       const data = bookCollection.find();
       const result = await data.toArray();
       res.send(result);
     });
 
-    app.post("/books", vrifyToken, async (req, res) => {
+    app.post("/books", verifyToken, async (req, res) => {
       const book = req.body;
       const result = await bookCollection.insertOne(book);
       res.send(result);
     });
 
-    app.get("/books/:name", vrifyToken,  async (req, res) => {
+    app.get("/books/:name", verifyToken,  async (req, res) => {
       const name = req.params.name;
       const query = { name: name };
       const book = await bookCollection.findOne(query);
@@ -233,10 +234,10 @@ async function run() {
 
     //////////////////////////////////////////////////////////////////
 
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
   }
 }
