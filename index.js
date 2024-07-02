@@ -115,6 +115,33 @@ async function run() {
           res.send(userData);
         });
 
+        app.get("/users", verifyToken, async (req, res) => {
+          const data = usersDB.find();
+          const result = await data.toArray();
+          res.send(result);
+        });
+
+
+        app.put("/users/:id", async (req, res) => {
+          const data = req.body;
+          const userRole = !data.librarian;
+          const paramsId = req.params.id;
+          const filter = { _id: new ObjectId(paramsId) };
+          const options = { upsert: true };
+          const updateDoc = {
+            $set: {
+              librarian: userRole,
+           
+            },
+          };
+          const result = await usersDB.updateOne(filter, updateDoc, options);
+          res.send(result);
+        });
+
+
+
+
+
 
     ////////////////////book Data APIs/////////////////////////
 
@@ -234,10 +261,10 @@ async function run() {
 
     //////////////////////////////////////////////////////////////////
 
-    // await client.db("admin").command({ ping: 1 });
-    // console.log(
-    //   "Pinged your deployment. You successfully connected to MongoDB!"
-    // );
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
   }
 }
